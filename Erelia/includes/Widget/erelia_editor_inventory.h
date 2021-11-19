@@ -119,9 +119,11 @@ private:
 		}
 	};
 
-	jgl::Vector2Int _elem_size;
+	jgl::Vector2 _elem_size;
 	jgl::Vector2 _nb_element_on_screen;
 	jgl::Size_t _index;
+	jgl::Vector2Int _selected_item_pos;
+	jgl::Size_t _page_index_selected;
 	jgl::Vector2Int _page_anchor;
 	jgl::Array<Inventory_page> _pages;
 	Inventory_item _selected_item;

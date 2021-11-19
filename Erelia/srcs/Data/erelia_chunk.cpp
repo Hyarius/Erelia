@@ -17,7 +17,7 @@ Chunk::Chunk(jgl::Vector2Int p_pos)
 	for (jgl::Size_t i = 0; i < C_SIZE; i++)
 		for (jgl::Size_t j = 0; j < C_SIZE; j++)
 		{
-			_nodes[i][j] = (i == 0 || j == 0 ? 1 : 0);
+			_nodes[i][j] = -1;
 			for (jgl::Size_t h = 0; h < C_NB_LAYER; h++)
 				_sceneries[i][j][h] = -1;
 		}
@@ -61,16 +61,16 @@ void Chunk::place_scenery(jgl::Vector2Int p_pos, jgl::Int p_level, jgl::Short p_
 	}
 }
 
-void Chunk::_save_chunk(jgl::String path)
+void Chunk::save(jgl::String p_path)
 {
-	jgl::File my_file = jgl::open_file(path, jgl::File_mode::out);
+	jgl::File my_file = jgl::open_file(p_path + "/" + _compose_name(), jgl::File_mode::out);
 	for (jgl::Size_t i = 0; i < C_SIZE; i++)
 	{
 		for (jgl::Size_t j = 0; j < C_SIZE; j++)
 		{
 			jgl::Short value = _nodes[i][j];
 			void* add = &(value);
-			my_file.write(static_cast<const char *>(add), sizeof(value));
+			my_file.write(static_cast<const char*>(add), sizeof(value));
 		}
 	}
 	for (jgl::Size_t i = 0; i < C_SIZE; i++)
@@ -88,17 +88,17 @@ void Chunk::_save_chunk(jgl::String path)
 	my_file.close();
 }
 
-void Chunk::load()
+void Chunk::load(jgl::String p_path)
 {
-	jgl::String path = "ressource/map/chunk/chunk" + jgl::itoa(_pos.x) + "x" + jgl::itoa(_pos.y) + "y";
+	jgl::String final_path = p_path + "/" + _compose_name();
 
-	if (jgl::check_file_exist(path) == true)
+	if (jgl::check_file_exist(final_path) == true)
 	{
-		jgl::File my_file = jgl::open_file(path, jgl::File_mode::in);
+		jgl::File my_file = jgl::open_file(final_path, jgl::File_mode::in);
 
 		void* tmp = _nodes;
 
-		my_file.read(static_cast<char*>(tmp), sizeof(jgl::Char) * C_SIZE * C_SIZE);
+		my_file.read(static_cast<char*>(tmp), sizeof(jgl::Short) * C_SIZE * C_SIZE);
 
 		tmp = _sceneries;
 

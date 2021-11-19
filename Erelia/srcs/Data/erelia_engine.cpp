@@ -4,7 +4,7 @@ Engine::Engine() :
 	_map(nullptr),
 	_player(nullptr)
 {
-	_map = new Map();
+	_map = new Map("overworld");
 	_player = new Player();
 
 	if (_player != nullptr)

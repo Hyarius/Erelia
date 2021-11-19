@@ -10,6 +10,10 @@ void Editor_inventory::_render()
 	{
 		_pages[_index].texture->draw(_anchor + _incrustation_frame->anchor(), _incrustation_frame->area(), _pages[_index].unit * _page_anchor, _nb_element_on_screen * _pages[_index].unit - 0.0001f, _depth + 10, 1.0f);
 	}
+	if (_index == _page_index_selected)
+	{
+		World_object::Scenery_part::C_TEXTURE_SHEET->draw(jgl::Vector2Int(0, 42), _anchor + _incrustation_frame->anchor() + (_selected_item_pos - _page_anchor) * (_elem_size + jgl::Vector2(0, 1)) - 3, _elem_size + 6, _depth + 15, 1.0f);
+	}
 }
 
 void Editor_inventory::_on_geometry_change()
@@ -25,7 +29,7 @@ void Editor_inventory::_on_geometry_change()
 
 	_incrustation_frame->set_geometry(_previous_page_button->anchor() + jgl::Vector2Int(0, button_size + 5), _area - jgl::Vector2Int(20, 20 + button_size + 5));
 
-	_elem_size = _incrustation_frame->area().x / _line_length;
+	_elem_size = static_cast<jgl::Float>(_incrustation_frame->area().x) / static_cast<jgl::Float>(_line_length);
 	_nb_element_on_screen = _incrustation_frame->area() / _elem_size;
 	for (jgl::Size_t i = 0; i < _pages.size(); i++)
 	{
@@ -44,10 +48,12 @@ jgl::Bool Editor_inventory::_update()
 	}
 	if (jgl::Application::active_application()->mouse().get_button(jgl::Mouse_button::Left) == jgl::Input_status::Release && _incrustation_frame->is_pointed() == true)
 	{
-		jgl::Vector2Int tmp_pos = (jgl::Application::active_application()->mouse().pos() - _incrustation_frame->anchor()) / _elem_size + _page_anchor;
+		jgl::Vector2Int tmp_pos = (jgl::Application::active_application()->mouse().pos() - _incrustation_frame->anchor()) / (_elem_size + jgl::Vector2(0, 1)) +_page_anchor;
 		if (_pages[_index].map.count(tmp_pos) != 0)
 		{
+			_selected_item_pos = tmp_pos;
 			_selected_item = _pages[_index].map[tmp_pos];
+			_page_index_selected = _index;
 		}
 	}
 	return (false);

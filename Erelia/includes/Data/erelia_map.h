@@ -6,10 +6,15 @@
 class Map
 {
 private:
+	jgl::String _folder_path;
+
 	jgl::Map<jgl::Vector2Int, Chunk*> _chunks;
 
 public:
-	Map();
+	Map(jgl::String p_folder_path);
+
+	void load();
+	void save();
 
 	void place_node(jgl::Vector2Int p_pos, jgl::Short p_value);
 	void place_scenery(jgl::Vector2Int p_pos, jgl::Int p_level, jgl::Short p_value);

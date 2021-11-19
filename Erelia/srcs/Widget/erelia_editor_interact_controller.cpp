@@ -80,8 +80,14 @@ jgl::Bool Editor_interact_controller::_update()
 	{
 
 	}
+	if (jgl::Application::active_application()->mouse().get_button(jgl::Mouse_button::Left) == jgl::Input_status::Pressed)
+	{
 
+	}
 	if (jgl::Application::active_application()->mouse().get_button(jgl::Mouse_button::Left) == jgl::Input_status::Down &&
+		_raise_level_button->is_pointed() == false &&
+		_level_label->is_pointed() == false &&
+		_reduce_level_button->is_pointed() == false &&
 		_slider_button->is_pointed() == false &&
 		_editor_inventory->is_pointed() == false)
 	{
@@ -108,6 +114,10 @@ jgl::Bool Editor_interact_controller::_update()
 		jgl::Vector2Int tmp_pos = Main_application::instance()->convert_screen_to_world(jgl::Application::active_application()->mouse().pos());
 
 		_engine->place_scenery(tmp_pos, _level, -1);
+	}
+	if (jgl::Application::active_application()->keyboard().get_key(jgl::Key::F7) == jgl::Input_status::Release)
+	{
+		_engine->map()->save();
 	}
 	return (false);
 }

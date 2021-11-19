@@ -28,8 +28,10 @@ private:
 	jgl::Buffer* _uvs_node_buffer;
 	jgl::Buffer* _uvs_scenery_buffer[C_NB_LAYER];
 
-	void _save_chunk(jgl::String path);
-
+	jgl::String _compose_name()
+	{
+		return ("chunk" + jgl::itoa(_pos.x) + "x" + jgl::itoa(_pos.y) + "y");
+	}
 	void _bake_points();
 	void _bake_autotile(const class Map* p_map, jgl::Sprite_sheet* p_sprite_sheet, jgl::Vector2* p_uvs, jgl::Vector2Int p_sprite, jgl::Vector2Int p_pos, jgl::Int p_level, jgl::Size_t base_index);
 	void _bake_tile(jgl::Sprite_sheet* p_sprite_sheet, jgl::Vector2* p_uvs, jgl::Vector2Int p_sprite, jgl::Size_t base_index);
@@ -49,7 +51,8 @@ public:
 	void place_node(jgl::Vector2Int p_pos, jgl::Short p_value);
 	void place_scenery(jgl::Vector2Int p_pos, jgl::Int p_level, jgl::Short p_value);
 
-	void load();
+	void save(jgl::String path);
+	void load(jgl::String path);
 
 	jgl::Bool baked() { return (_baked && _points_baked); }
 
