@@ -40,13 +40,22 @@ namespace World_object
 		jgl::Vector2Int icon;
 		jgl::Uint base;
 		jgl::Vector2Int size;
+		jgl::Map<jgl::Vector2Int, jgl::Int> levels;
 
-		Scenery(jgl::String p_name = "Undefined", jgl::Vector2Int p_icon = 0, jgl::Uint p_base = 0u, jgl::Vector2Int p_size = 1)
+		Scenery(jgl::String p_name = "Undefined", jgl::Vector2Int p_icon = 0, jgl::Uint p_base = 0u, jgl::Vector2Int p_size = 1, jgl::Int **p_levels = nullptr)
 		{
 			name = p_name;
 			icon = p_icon;
 			base = p_base;
 			size = p_size;
+			if (p_levels == nullptr)
+			{
+				for (jgl::Size_t i = 0; i < size.x; i++)
+					for (jgl::Size_t i = 0; i < size.y; i++)
+					{
+
+					}
+			}
 		}
 		friend std::ostream& operator<<(std::ostream& os, const Scenery& other)
 		{
@@ -64,7 +73,7 @@ namespace World_object
 		jgl::Size_t animation_size;
 		jgl::Bool obstacle;
 
-		Scenery_part(jgl::Vector2Int p_sprite = 0, jgl::Bool p_autotiled = false, jgl::Bool p_obstacle = true, jgl::Size_t p_animation_size = 0)
+		Scenery_part(jgl::Vector2Int p_sprite = 0, jgl::Bool p_autotiled = false, jgl::Bool p_obstacle = true, jgl::Size_t p_animation_size = 1)
 		{
 			autotiled = p_autotiled;
 			sprite = p_sprite;

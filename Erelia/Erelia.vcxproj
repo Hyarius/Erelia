@@ -181,6 +181,7 @@
     <ClCompile Include="srcs\main.cpp" />
     <ClCompile Include="srcs\Widget\erelia_editor_interact_controller.cpp" />
     <ClCompile Include="srcs\Widget\erelia_editor_inventory.cpp" />
+    <ClCompile Include="srcs\Widget\erelia_editor_inventory_page.cpp" />
     <ClCompile Include="srcs\Widget\erelia_entity_renderer.cpp" />
     <ClCompile Include="srcs\Widget\erelia_entity_updater.cpp" />
     <ClCompile Include="srcs\Widget\erelia_map_renderer.cpp" />

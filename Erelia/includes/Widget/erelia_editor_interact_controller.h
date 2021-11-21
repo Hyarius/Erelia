@@ -15,6 +15,7 @@ private:
 	jgl::Vector2Int _level_label_anchor;
 	jgl::Vector2Int _reducer_anchor;
 
+	jgl::Bool _in_motion;
 	jgl::Vector2 _start_position;
 	jgl::Vector2 _final_position;
 	const jgl::Size_t _duration_time = 200u;
@@ -23,6 +24,10 @@ private:
 
 	std::function<void (jgl::Data_contener)> _function_open;
 	std::function<void (jgl::Data_contener)> _function_close;
+
+	jgl::Bool _placing_multiple_node;
+	jgl::Vector2Int _start_placement_position;
+	jgl::Vector2Int _end_placement_position;
 
 	Engine* _engine;
 
@@ -49,6 +54,10 @@ private:
 			_level = p_level;
 		_level_label->label().set_text("Lvl : " + jgl::itoa(_level));
 	}
+
+	jgl::Bool _map_pointed();
+	void _update_slider();
+	void _use_item(jgl::Vector2Int p_pos);
 
 public:
 	Editor_interact_controller(Engine* p_engine, jgl::Widget* p_parent);

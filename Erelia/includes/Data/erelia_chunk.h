@@ -6,6 +6,7 @@
 class Chunk
 {
 public:
+	static const jgl::Size_t C_NB_FRAME = 12u;
 	static const jgl::Size_t C_SIZE = 16u;
 	static const jgl::Size_t C_NB_LAYER = 5u;
 private:
@@ -25,8 +26,12 @@ private:
 	static jgl::Vector2* _bake_uvs_array;
 	static jgl::Shader* _chunk_shader;
 
-	jgl::Buffer* _uvs_node_buffer;
-	jgl::Buffer* _uvs_scenery_buffer[C_NB_LAYER];
+	struct Framed_buffer
+	{
+		jgl::Buffer* _uvs_node_buffer;
+		jgl::Buffer* _uvs_scenery_buffer[C_NB_LAYER];
+	};
+	Framed_buffer _framed_buffers[C_NB_FRAME];
 
 	jgl::String _compose_name()
 	{
@@ -35,11 +40,13 @@ private:
 	void _bake_points();
 	void _bake_autotile(const class Map* p_map, jgl::Sprite_sheet* p_sprite_sheet, jgl::Vector2* p_uvs, jgl::Vector2Int p_sprite, jgl::Vector2Int p_pos, jgl::Int p_level, jgl::Size_t base_index);
 	void _bake_tile(jgl::Sprite_sheet* p_sprite_sheet, jgl::Vector2* p_uvs, jgl::Vector2Int p_sprite, jgl::Size_t base_index);
+	void _bake_nodes_frame(const class Map* p_map, jgl::Size_t p_frame);
+	void _bake_sceneries_frame(const class Map* p_map, jgl::Size_t p_frame);
 	void _bake_nodes(const class Map* p_map);
 	void _bake_sceneries(const class Map* p_map);
 
-	void _render_nodes(jgl::Vector3& p_delta_pos, jgl::Float p_depth);
-	void _render_sceneries(jgl::Vector3& p_delta_pos, jgl::Int p_level, jgl::Float p_depth);
+	void _render_nodes(jgl::Vector3& p_delta_pos, jgl::Float p_depth, jgl::Size_t p_frame);
+	void _render_sceneries(jgl::Vector3& p_delta_pos, jgl::Int p_level, jgl::Float p_depth, jgl::Size_t p_frame);
 
 	void _compose_neightbour_chunk(const Map* p_map);
 public:
@@ -60,5 +67,5 @@ public:
 	void unbake();
 	void bake(const class Map* p_map);
 	void rebake(const class Map* p_map);
-	void render(jgl::Float p_depth);
+	void render(jgl::Float p_depth, jgl::Size_t p_frame);
 };

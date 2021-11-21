@@ -81,6 +81,9 @@
     <ClCompile Include="srcs\Widget\erelia_editor_inventory.cpp">
       <Filter>Source Files\Widget</Filter>
     </ClCompile>
+    <ClCompile Include="srcs\Widget\erelia_editor_inventory_page.cpp">
+      <Filter>Source Files\Widget</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\erelia.h">

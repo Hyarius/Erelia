@@ -10,6 +10,10 @@ void Map_renderer::_render()
 	if (_map == nullptr)
 		return;
 
+	static const jgl::Size_t sub_part = (1000 / Chunk::C_NB_FRAME) + 1;
+
+	jgl::Size_t nb_frame = (jgl::Application::active_application()->time() % 1000) / sub_part;
+
 	jgl::Vector2Int start = (Main_application::instance()->convert_screen_to_world(0) / Chunk::C_SIZE).floor() - 1;
 
 	jgl::Vector2Int end = (Main_application::instance()->convert_screen_to_world(jgl::Application::active_application()->size()) / Chunk::C_SIZE).floor() + 1;
@@ -27,12 +31,11 @@ void Map_renderer::_render()
 				{
 					tmp_chunk->bake(_map);
 				}
-				tmp_chunk->render(_depth + 3);
+				tmp_chunk->render(_depth + 3, nb_frame);
 			}
 		}
 	}
 
-	jgl::draw_text("FPS : " + jgl::itoa(jgl::Application::active_application()->fps()), 50, 20, _depth + 1000, 1.0f, jgl::Color::white(), jgl::Color::black());
 }
 
 bool Map_renderer::_update()

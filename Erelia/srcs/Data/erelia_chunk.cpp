@@ -22,10 +22,14 @@ Chunk::Chunk(jgl::Vector2Int p_pos)
 				_sceneries[i][j][h] = -1;
 		}
 
-	_uvs_node_buffer = nullptr;
+	for (jgl::Size_t i = 0; i < C_NB_FRAME; i++)
+	{
+		_framed_buffers[i]._uvs_node_buffer = nullptr;
 
-	for (jgl::Size_t i = 0; i < C_NB_LAYER; i++)
-		_uvs_scenery_buffer[i] = nullptr;
+		for (jgl::Size_t j = 0; j < C_NB_LAYER; j++)
+			_framed_buffers[i]._uvs_scenery_buffer[j] = nullptr;
+	}
+
 
 	for (jgl::Size_t i = 0; i < 3; i++)
 	{
@@ -366,15 +370,14 @@ void Chunk::_bake_tile(jgl::Sprite_sheet* p_sprite_sheet, jgl::Vector2* p_uvs, j
 	}
 }
 
-void Chunk::_bake_nodes(const Map* p_map)
+void Chunk::_bake_nodes_frame(const Map* p_map, jgl::Size_t p_frame)
 {
-
 	if (_chunk_shader == nullptr)
 		_chunk_shader = jgl::Application::active_application()->shader("Chunk_shader");
 	if (_uv_base_buffer == nullptr)
 		_uv_base_buffer = _chunk_shader->buffer("vertexUV");
-	if (_uvs_node_buffer == nullptr)
-		_uvs_node_buffer = _uv_base_buffer->copy();
+	if (_framed_buffers[p_frame]._uvs_node_buffer == nullptr)
+		_framed_buffers[p_frame]._uvs_node_buffer = _uv_base_buffer->copy();
 
 	if (_bake_uvs_array == nullptr)
 		_bake_uvs_array = new jgl::Vector2[C_SIZE * C_SIZE * 16];
@@ -397,18 +400,26 @@ void Chunk::_bake_nodes(const Map* p_map)
 				World_object::Node& tmp_node = World_object::g_node_array[_nodes[i][j]];
 
 				if (tmp_node.autotiled == true)
-					_bake_autotile(p_map, World_object::Node::C_TEXTURE_SHEET, _bake_uvs_array, tmp_node.sprite, jgl::Vector2Int(i, j), -1, index);
+					_bake_autotile(p_map, World_object::Node::C_TEXTURE_SHEET, _bake_uvs_array, tmp_node.sprite + jgl::Vector2Int(p_frame / (C_NB_FRAME / tmp_node.animation_size), 0) * 4, jgl::Vector2Int(i, j), -1, index);
 				else
-					_bake_tile(World_object::Node::C_TEXTURE_SHEET, _bake_uvs_array, tmp_node.sprite, index);
+					_bake_tile(World_object::Node::C_TEXTURE_SHEET, _bake_uvs_array, tmp_node.sprite + jgl::Vector2Int(p_frame / (C_NB_FRAME / tmp_node.animation_size), 0) * 4, index);
 			}
 
 		}
 	}
 
-	_uvs_node_buffer->send(_bake_uvs_array, C_SIZE * C_SIZE * 16);
+	_framed_buffers[p_frame]._uvs_node_buffer->send(_bake_uvs_array, C_SIZE * C_SIZE * 16);
 }
 
-void Chunk::_bake_sceneries(const Map* p_map)
+void Chunk::_bake_nodes(const Map* p_map)
+{
+	for (jgl::Size_t i = 0; i < Chunk::C_NB_FRAME; i++)
+	{
+		_bake_nodes_frame(p_map, i);
+	}
+}
+
+void Chunk::_bake_sceneries_frame(const Map* p_map, jgl::Size_t p_frame)
 {
 	if (_chunk_shader == nullptr)
 		_chunk_shader = jgl::Application::active_application()->shader("Chunk_shader");
@@ -418,8 +429,8 @@ void Chunk::_bake_sceneries(const Map* p_map)
 	for (jgl::Size_t h = 0; h < C_NB_LAYER; h++)
 	{
 
-		if (_uvs_scenery_buffer[h] == nullptr)
-			_uvs_scenery_buffer[h] = _uv_base_buffer->copy();
+		if (_framed_buffers[p_frame]._uvs_scenery_buffer[h] == nullptr)
+			_framed_buffers[p_frame]._uvs_scenery_buffer[h] = _uv_base_buffer->copy();
 
 		if (_bake_uvs_array == nullptr)
 			_bake_uvs_array = new jgl::Vector2[C_SIZE * C_SIZE * 16];
@@ -442,14 +453,22 @@ void Chunk::_bake_sceneries(const Map* p_map)
 					World_object::Scenery_part& tmp_scenery_part = World_object::g_scenery_part_array[_sceneries[i][j][h]];
 
 					if (tmp_scenery_part.autotiled == true)
-						_bake_autotile(p_map, World_object::Scenery_part::C_TEXTURE_SHEET, _bake_uvs_array, tmp_scenery_part.sprite, jgl::Vector2Int(i, j), h, index);
+						_bake_autotile(p_map, World_object::Scenery_part::C_TEXTURE_SHEET, _bake_uvs_array, tmp_scenery_part.sprite + jgl::Vector2Int(p_frame / (C_NB_FRAME / tmp_scenery_part.animation_size), 0), jgl::Vector2Int(i, j), h, index);
 					else
-						_bake_tile(World_object::Scenery_part::C_TEXTURE_SHEET, _bake_uvs_array, tmp_scenery_part.sprite, index);
+						_bake_tile(World_object::Scenery_part::C_TEXTURE_SHEET, _bake_uvs_array, tmp_scenery_part.sprite + jgl::Vector2Int(p_frame / (C_NB_FRAME / tmp_scenery_part.animation_size), 0), index);
 				}
 
 			}
 		}
-		_uvs_scenery_buffer[h]->send(_bake_uvs_array, C_SIZE * C_SIZE * 16);
+		_framed_buffers[p_frame]._uvs_scenery_buffer[h]->send(_bake_uvs_array, C_SIZE * C_SIZE * 16);
+	}
+}
+
+void Chunk::_bake_sceneries(const Map* p_map)
+{
+	for (jgl::Size_t i = 0; i < Chunk::C_NB_FRAME; i++)
+	{
+		_bake_sceneries_frame(p_map, i);
 	}
 }
 
@@ -498,7 +517,7 @@ void Chunk::rebake(const Map* p_map)
 	_baked = true;
 }
 
-void Chunk::_render_nodes(jgl::Vector3& p_delta_pos, jgl::Float p_depth)
+void Chunk::_render_nodes(jgl::Vector3& p_delta_pos, jgl::Float p_depth, jgl::Size_t p_frame)
 {
 	if (_chunk_shader == nullptr)
 		_chunk_shader = jgl::Application::active_application()->shader("Chunk_shader");
@@ -507,7 +526,8 @@ void Chunk::_render_nodes(jgl::Vector3& p_delta_pos, jgl::Float p_depth)
 
 	_point_buffer->activate();
 	_element_buffer->activate();
-	_uvs_node_buffer->activate();
+
+	_framed_buffers[p_frame]._uvs_node_buffer->activate();
 
 	p_delta_pos.z = static_cast<jgl::Float>(p_depth) / 10000.0f;
 	if (_position_uniform == nullptr)
@@ -523,7 +543,7 @@ void Chunk::_render_nodes(jgl::Vector3& p_delta_pos, jgl::Float p_depth)
 	World_object::Node::C_TEXTURE_SHEET->desactivate();
 }
 
-void Chunk::_render_sceneries(jgl::Vector3& p_delta_pos, jgl::Int p_level, jgl::Float p_depth)
+void Chunk::_render_sceneries(jgl::Vector3& p_delta_pos, jgl::Int p_level, jgl::Float p_depth, jgl::Size_t p_frame)
 {
 	if (_chunk_shader == nullptr)
 		_chunk_shader = jgl::Application::active_application()->shader("Chunk_shader");
@@ -532,7 +552,7 @@ void Chunk::_render_sceneries(jgl::Vector3& p_delta_pos, jgl::Int p_level, jgl::
 
 	_point_buffer->activate();
 	_element_buffer->activate();
-	_uvs_scenery_buffer[p_level]->activate();
+	_framed_buffers[p_frame]._uvs_scenery_buffer[p_level]->activate();
 
 	p_delta_pos.z = static_cast<jgl::Float>(p_level + p_depth) / 10000.0f;
 	if (_position_uniform == nullptr)
@@ -549,7 +569,7 @@ void Chunk::_render_sceneries(jgl::Vector3& p_delta_pos, jgl::Int p_level, jgl::
 
 }
 
-void Chunk::render(jgl::Float p_depth)
+void Chunk::render(jgl::Float p_depth, jgl::Size_t p_frame)
 {
 	if (_baked == false || _points_baked == false)
 		return;
@@ -566,17 +586,17 @@ void Chunk::render(jgl::Float p_depth)
 	_chunk_shader->activate();
 
 	//Render nodes
-	_render_nodes(delta_pos, p_depth - 1);
+	_render_nodes(delta_pos, p_depth - 1, p_frame);
 
 	//Render sceneries under player foot
 	for (jgl::Int i = 0; i < 3; i++)
 	{
-		_render_sceneries(delta_pos, i, p_depth);
+		_render_sceneries(delta_pos, i, p_depth, p_frame);
 	}
 
 	//Render sceneries over player foot
 	for (jgl::Int i = 3; i < C_NB_LAYER; i++)
 	{
-		_render_sceneries(delta_pos, i, p_depth + 1);
+		_render_sceneries(delta_pos, i, p_depth + 1, p_frame);
 	}
 }

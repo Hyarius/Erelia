@@ -8,12 +8,15 @@ void Editor_inventory::_render()
 
 	if (_pages.size() > _index && _pages[_index].size != 0)
 	{
+		if (_pages[_index].texture != nullptr)
 		_pages[_index].texture->draw(_anchor + _incrustation_frame->anchor(), _incrustation_frame->area(), _pages[_index].unit * _page_anchor, _nb_element_on_screen * _pages[_index].unit - 0.0001f, _depth + 10, 1.0f);
 	}
 	if (_index == _page_index_selected)
 	{
-		World_object::Scenery_part::C_TEXTURE_SHEET->draw(jgl::Vector2Int(0, 42), _anchor + _incrustation_frame->anchor() + (_selected_item_pos - _page_anchor) * (_elem_size + jgl::Vector2(0, 1)) - 3, _elem_size + 6, _depth + 15, 1.0f);
+		World_object::Scenery_part::C_TEXTURE_SHEET->draw(jgl::Vector2Int(0, 42), _anchor + _incrustation_frame->anchor() + ((_selected_item_pos - _page_anchor) * (_elem_size + jgl::Vector2(0, 2))) + jgl::Vector2Int(0, 1) - 3, _elem_size + 6, _depth + 15, 1.0f);
 	}
+
+	jgl::draw_text("FPS : " + jgl::itoa(jgl::Application::active_application()->fps()), 50, 20, _depth + 1000, 1.0f, jgl::Color::white(), jgl::Color::black());
 }
 
 void Editor_inventory::_on_geometry_change()
